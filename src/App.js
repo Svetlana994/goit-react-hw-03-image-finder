@@ -39,6 +39,7 @@ class App extends Component {
             status: "resolved",
           }));
         }
+
         if (page > 1) {
           window.scrollTo({
             top: document.documentElement.scrollHeight,
@@ -101,10 +102,7 @@ class App extends Component {
         <Searchbar onSubmit={this.handleFormSubmit} />
 
         {pending && <LoaderComponent />}
-        {resolved && (
-          <ImageGallery images={images} modalImage={this.selectModalImage} />
-        )}
-
+        <ImageGallery images={images} modalImage={this.selectModalImage} />
         {resolved && <Button onLoad={this.loadMoreImages} />}
         {picture && <Modal picture={picture} onClick={this.onModalClick} />}
         <ToastContainer autoClose={2000} />
