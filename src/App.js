@@ -72,7 +72,6 @@ class App extends Component {
   };
 
   onModalClick = (e) => {
-    console.log(e.currentTarget);
     if (e.currentTarget === e.target) {
       this.setState({ picture: null });
     }
@@ -95,7 +94,7 @@ class App extends Component {
 
     const pending = status === "pending";
 
-    const resolved = images && status === "resolved";
+    const resolved = status === "resolved";
 
     return (
       <Container>
@@ -106,7 +105,7 @@ class App extends Component {
           <ImageGallery images={images} modalImage={this.selectModalImage} />
         )}
 
-        {images.length > 0 && <Button onLoad={this.loadMoreImages} />}
+        {resolved && <Button onLoad={this.loadMoreImages} />}
         {picture && <Modal picture={picture} onClick={this.onModalClick} />}
         <ToastContainer autoClose={2000} />
       </Container>
