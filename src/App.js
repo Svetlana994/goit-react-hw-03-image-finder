@@ -23,22 +23,19 @@ class App extends Component {
   async componentDidUpdate(_, prevState) {
     const { pictureQuery, page } = this.state;
 
-    if (prevState.pictureQuery !== pictureQuery || prevState.page !== page) {
+    if (
+      (pictureQuery && prevState.pictureQuery !== pictureQuery) ||
+      prevState.page !== page
+    ) {
       this.setState({ status: "pending" });
 
       try {
         const promises = await fetchImages(pictureQuery, page);
 
-        if (prevState.pictureQuery !== pictureQuery && pictureQuery) {
-          this.setState({ images: [...promises], status: "resolved", page: 1 });
-        }
-
-        if (prevState.page !== page) {
-          this.setState((prevState) => ({
-            images: [...prevState.images, ...promises],
-            status: "resolved",
-          }));
-        }
+        this.setState((prevState) => ({
+          images: [...prevState.images, ...promises],
+          status: "resolved",
+        }));
 
         if (page > 1) {
           window.scrollTo({
@@ -49,12 +46,12 @@ class App extends Component {
 
         if (promises.length === 0) {
           this.setState({ pictureQuery: "" });
-          toast.error("Enter a valid search query");
 
           throw new Error();
         }
       } catch (error) {
         this.setState({ error, status: "rejected" });
+        toast.error("Enter a valid search query");
       }
     }
     window.addEventListener("keydown", this.handleKeydown);
@@ -65,6 +62,15 @@ class App extends Component {
   }
 
   handleFormSubmit = (pictureQuery) => {
+    if (this.state.pictureQuery === pictureQuery) {
+      return;
+    } else {
+      this.setState({
+        pictureQuery: "",
+        page: 1,
+        images: [],
+      });
+    }
     this.setState({ pictureQuery });
   };
 
@@ -91,7 +97,7 @@ class App extends Component {
   };
 
   render() {
-    const { status, images, picture, pictureQuery } = this.state;
+    const { status, images, picture } = this.state;
 
     const pending = status === "pending";
 
@@ -103,6 +109,7 @@ class App extends Component {
 
         {pending && <LoaderComponent />}
         <ImageGallery images={images} modalImage={this.selectModalImage} />
+
         {resolved && <Button onLoad={this.loadMoreImages} />}
         {picture && <Modal picture={picture} onClick={this.onModalClick} />}
         <ToastContainer autoClose={2000} />
